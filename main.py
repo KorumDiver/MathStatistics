@@ -1,6 +1,9 @@
+import math
+
 import DataReader as dr
 import numpy as np
-import matplotlib.pyplot as plt
+import scipy.stats.distributions as sps
+import scipy.special as spec
 
 
 def main():
@@ -9,7 +12,7 @@ def main():
     Коробов А.А. 09-821
     """
     Task_1()
-    print()
+    print('__________________________________________________________________________________________________________')
     Task_2()
 
 
@@ -86,11 +89,10 @@ def Task_1():
     if M > c_crit:
         print('(Нулевая гипотиза отвергается. Так как M > ', c_crit, ')', sep='')
     else:
-        print('(Нулевая гипотеза принимается. Так как M > ', c_crit, ')', sep='')
+        print('(Нулевая гипотеза принимается. Так как M <= ', c_crit, ')', sep='')
 
     p_value = 1 - Fbin(M, len(data))
     print('P-значение:', p_value)
-    print('___________________________________________________________________________________________________________')
 
 
 def Task_2():
@@ -99,8 +101,47 @@ def Task_2():
     :return:
     """
     print('Task_2')
-    value = np.sort(dr.rf_task_2('Data/Data2_txt.txt'))
-    print(value)
+    data = np.sort(dr.rf_task_2('Data/Data2_txt.txt'))
+
+    r = len(data) // 5
+    intervals = np.linspace(data[0], data[-1], r + 1)
+
+    v = []
+    for i in range(r):
+        num = 0
+        for j in data:
+            if intervals[i] <= j < intervals[i + 1]:
+                num += 1
+        v.append(num)
+
+    x_mean = np.mean(data)
+    x_var = np.var(data) ** 0.5
+
+    def F(x):
+        return (1 + spec.erf(x / (2 ** 0.5))) / 2
+
+    p = [F((intervals[1] - x_mean) / x_var)]
+    for i in range(2, len(intervals) - 1):
+        p.append(F((intervals[i] - x_mean) / x_var) - F((intervals[i - 1] - x_mean) / x_var))
+    p.append(1 - F((intervals[-2] - x_mean) / x_var))
+
+    T = sum([(v[k] - len(data) * p[k]) ** 2 / len(data) * p[k] for k in range(r)])
+
+    alf = 0.1
+    c_crit = sps.chi2.ppf(alf, r - 1)
+    print('Критическая константа:', c_crit)
+    print('Вид критической области: ', 'A = { T: T > ', c_crit, '}', sep='')
+
+    print('Статистика критерия хи-квадрат:', T)
+    if T > c_crit:
+        print('(Нулевая гипотиза отвергается. Так как T > ', c_crit, ')', sep='')
+        print('Или же  p_r−1 < alf:', 1 - sps.chi2.cdf(T, r - 3), '<', alf)
+    else:
+        print('(Нулевая гипотеза принимается. Так как T <= ', c_crit, ')', sep='')
+        print('Или же  p_r-m−1 > alf:', 1 - sps.chi2.cdf(T, r - 1), '>', alf)
+
+    p_value = 1 - sps.chi2.cdf(T, r - 1)
+    print('P-значение:', p_value)
 
 
 if __name__ == '__main__':
