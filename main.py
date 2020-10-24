@@ -105,6 +105,8 @@ def Task_2():
 
     r = len(data) // 5
     intervals = np.linspace(data[0], data[-1], r + 1)
+    intervals[0] = float('-inf')
+    intervals[-1] = float('inf')
 
     v = []
     for i in range(r):
@@ -113,7 +115,6 @@ def Task_2():
             if intervals[i] <= j < intervals[i + 1]:
                 num += 1
         v.append(num)
-
     x_mean = np.mean(data)
     x_var = np.var(data) ** 0.5
 
@@ -125,22 +126,21 @@ def Task_2():
         p.append(F((intervals[i] - x_mean) / x_var) - F((intervals[i - 1] - x_mean) / x_var))
     p.append(1 - F((intervals[-2] - x_mean) / x_var))
 
-    T = sum([(v[k] - len(data) * p[k]) ** 2 / len(data) * p[k] for k in range(r)])
+    T = sum([(v[k] - len(data) * p[k]) ** 2 / (len(data) * p[k]) for k in range(r)])
 
     alf = 0.1
-    c_crit = sps.chi2.ppf(alf, r - 1)
+    c_crit = sps.chi2.ppf(1 - alf, r - 1)
     print('Критическая константа:', c_crit)
     print('Вид критической области: ', 'A = { T: T > ', c_crit, '}', sep='')
 
     print('Статистика критерия хи-квадрат:', T)
-    if T > c_crit:
-        print('(Нулевая гипотиза отвергается. Так как T > ', c_crit, ')', sep='')
-        print('Или же  p_r−1 < alf:', 1 - sps.chi2.cdf(T, r - 3), '<', alf)
-    else:
-        print('(Нулевая гипотеза принимается. Так как T <= ', c_crit, ')', sep='')
-        print('Или же  p_r-m−1 > alf:', 1 - sps.chi2.cdf(T, r - 1), '>', alf)
+    if alf < 1 - sps.chi2.cdf(T, r - 3):
+        p_value = 1 - sps.chi2.cdf(T, r - 3)
+        print('Или же  p_r−3 > alf:', p_value, '>', alf)
+    elif alf > 1 - sps.chi2.cdf(T, r - 1):
+        p_value = 1 - sps.chi2.cdf(T, r - 1)
+        print('Или же  p_r-1 < alf:', p_value, '<', alf)
 
-    p_value = 1 - sps.chi2.cdf(T, r - 1)
     print('P-значение:', p_value)
 
 
