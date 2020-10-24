@@ -101,9 +101,9 @@ def Task_2():
     :return:
     """
     print('Task_2')
-    data = np.sort(dr.rf_task_2('Data/Data2_txt.txt'))
+    data = np.sort(dr.rf_task_2('Data/Data3_txt.txt'))
 
-    r = len(data) // 5
+    r = 8
     intervals = np.linspace(data[0], data[-1], r + 1)
     intervals[0] = float('-inf')
     intervals[-1] = float('inf')
@@ -128,7 +128,7 @@ def Task_2():
 
     T = sum([(v[k] - len(data) * p[k]) ** 2 / (len(data) * p[k]) for k in range(r)])
 
-    alf = 0.1
+    alf = 0.01
     c_crit = sps.chi2.ppf(1 - alf, r - 1)
     print('Критическая константа:', c_crit)
     print('Вид критической области: ', 'A = { T: T > ', c_crit, '}', sep='')
@@ -136,10 +136,10 @@ def Task_2():
     print('Статистика критерия хи-квадрат:', T)
     if alf < 1 - sps.chi2.cdf(T, r - 3):
         p_value = 1 - sps.chi2.cdf(T, r - 3)
-        print('Или же  p_r−3 > alf:', p_value, '>', alf)
+        print('(Нулевая гипотиза принимается. Так как p_r-3 > alf:', p_value, '>', alf)
     elif alf > 1 - sps.chi2.cdf(T, r - 1):
         p_value = 1 - sps.chi2.cdf(T, r - 1)
-        print('Или же  p_r-1 < alf:', p_value, '<', alf)
+        print('(Нулевая гипотиза отвергается. Так как p_r-1 < alf:', p_value, '<', alf)
 
     print('P-значение:', p_value)
 
