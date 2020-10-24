@@ -101,9 +101,9 @@ def Task_2():
     :return:
     """
     print('Task_2')
-    data = np.sort(dr.rf_task_2('Data/Data3_txt.txt'))
+    data = np.sort(dr.rf_task_2('Data/Data2_txt.txt'))
 
-    r = 8
+    r = len(data)//5
     intervals = np.linspace(data[0], data[-1], r + 1)
     intervals[0] = float('-inf')
     intervals[-1] = float('inf')
@@ -128,7 +128,7 @@ def Task_2():
 
     T = sum([(v[k] - len(data) * p[k]) ** 2 / (len(data) * p[k]) for k in range(r)])
 
-    alf = 0.01
+    alf = 0.1
     c_crit = sps.chi2.ppf(1 - alf, r - 1)
     print('Критическая константа:', c_crit)
     print('Вид критической области: ', 'A = { T: T > ', c_crit, '}', sep='')
