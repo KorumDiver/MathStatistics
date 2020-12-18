@@ -1,6 +1,4 @@
-import math
-
-import DataReader as dr
+from Task_2 import DataReader as dr
 import numpy as np
 import scipy.stats.distributions as sps
 import scipy.special as spec
@@ -79,7 +77,7 @@ def Task_1():
     data = dr.rf_task_1('Data/Data1_txt.txt')
 
     n = len(data)  # Количесто элементов в выборке
-    alf = 0.01  # Уровень значисости
+    alf = 0.01  # Уровень значимости
     c_crit = search_c_crit(n, alf)  # Критическая константа
     print('Критическая константа:', c_crit)
     print('Вид критической области: ', 'A = { M: M > ', c_crit, '}', sep='')
